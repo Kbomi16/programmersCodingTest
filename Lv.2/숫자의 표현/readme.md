@@ -53,3 +53,5 @@ function solution(n) {
   return count
 }
 ```
+
+![alt text](image-3.png)
