@@ -1,0 +1,70 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: #fff;
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 30px;
+}
+
+#container {
+  overflow-x: auto;
+  padding-bottom: 40px;
+  white-space: nowrap;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+}
+
+.tree-node {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1rem 0;
+  min-width: 100px;
+  position: relative;
+}
+
+/* 배열 테이블 스타일 */
+table {
+  border-collapse: collapse;
+  margin: 8px 0;
+  width: max-content;
+}
+td {
+  border: 1px solid #666;
+  padding: 8px 12px;
+  font-weight: bold;
+  font-size: 18px;
+  min-width: 35px;
+  text-align: center;
+  position: relative;
+  background-color: #fff;
+  user-select: none;
+}
+td.fixed {
+  background-color: #f1c40f; /* 노랑 - 확정 */
+  color: #222;
+}
+td.min {
+  background-color: #eeb0a9; /* 빨강 - 최소값 */
+  color: white;
+}
+td.current::after {
+  content: '↓';
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  color: #34495e;
+  user-select: none;
+}
+
+.children {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
