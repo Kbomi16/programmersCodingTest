@@ -8,7 +8,7 @@ const quickSortTreeSteps = [
     pivotIndex: 0,
     left: {
       title: '왼쪽: 피벗 10',
-      arr: [10, 5],
+      arr: [10, 29, 5],
       pivotIndex: 0,
       left: {
         title: '왼쪽: [5] - 완료',
@@ -16,25 +16,21 @@ const quickSortTreeSteps = [
         fixed: true,
       },
       right: {
-        title: '오른쪽: [] - 없음',
+        title: '오른쪽: 피벗 29',
+        arr: [29],
+        pivotIndex: 0,
+        fixed: true,
       },
     },
     right: {
       title: '오른쪽: 피벗 55',
-      arr: [55, 71, 29, 41],
+      arr: [55, 71, 41],
       pivotIndex: 0,
       left: {
-        title: '왼쪽: 피벗 29',
-        arr: [29, 41],
+        title: '왼쪽: 피벗 41',
+        arr: [41],
         pivotIndex: 0,
-        left: {
-          title: '왼쪽: [] - 없음',
-        },
-        right: {
-          title: '오른쪽: [41] - 완료',
-          arr: [41],
-          fixed: true,
-        },
+        fixed: true,
       },
       right: {
         title: '오른쪽: [71] - 완료',
