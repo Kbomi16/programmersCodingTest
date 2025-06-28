@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>후위표기법 스택 시각화</title>
+    <style>
+      body {
+        font-family: 'Noto Sans KR', sans-serif;
+        background: #f7f7f7;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      .step {
+        background: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 20px auto;
+        max-width: 500px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+      .step-title {
+        font-weight: bold;
+        margin-bottom: 12px;
+        color: #444;
+      }
+      .stack-box {
+        display: flex;
+        flex-direction: column-reverse; /* 아래에서 위로 쌓이게 */
+        gap: 8px;
+        background: #eef7ff;
+        border: 2px solid #3399cc;
+        padding: 10px;
+        border-radius: 8px;
+        width: 120px;
+        margin: 0 auto;
+      }
+      .stack-item {
+        background: #3399cc;
+        color: white;
+        text-align: center;
+        padding: 8px;
+        border-radius: 6px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>후위표기법 계산 과정</h1>
+    <div id="container"></div>
+
+    <script>
+      const tokens = ['3', '4', '+', '2', '*']
+      const steps = []
+      let stack = []
+
+      tokens.forEach((token, idx) => {
+        if (!isNaN(token)) {
+          stack.push(token)
+          steps.push({
+            step: idx + 1,
+            action: `피연산자 ${token} push`,
+            stack: [...stack],
+          })
+        } else {
+          const b = stack.pop()
+          const a = stack.pop()
+          const result = `(${a} ${token} ${b})`
+          stack.push(result)
+          steps.push({
+            step: idx + 1,
+            action: `연산자 ${token}: ${a} ${token} ${b} 연산 → 결과 push`,
+            stack: [...stack],
+          })
+        }
+      })
+
+      const container = document.getElementById('container')
+      steps.forEach(({ step, action, stack }) => {
+        const div = document.createElement('div')
+        div.className = 'step'
+
+        const title = document.createElement('div')
+        title.className = 'step-title'
+        title.textContent = `단계 ${step}: ${action}`
+        div.appendChild(title)
+
+        const stackDiv = document.createElement('div')
+        stackDiv.className = 'stack-box'
+        stack.forEach((item) => {
+          const itemDiv = document.createElement('div')
+          itemDiv.className = 'stack-item'
+          itemDiv.textContent = item
+          stackDiv.appendChild(itemDiv)
+        })
+
+        div.appendChild(stackDiv)
+        container.appendChild(div)
+      })
+    </script>
+  </body>
+</html>

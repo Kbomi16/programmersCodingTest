@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>콜스택 시각화 (심플 버전)</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
+      * {
+        font-family: 'Noto Sans KR', Helvetica, sans-serif;
+      }
+      body {
+        background: #fafafa;
+        margin: 20px;
+        user-select: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        min-height: 100vh;
+      }
+
+      #btnRun {
+        padding: 12px 28px;
+        font-weight: 600;
+        font-size: 1rem;
+        border: none;
+        border-radius: 6px;
+        background: #f1c40f;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 2px 6px #f1c40f;
+        transition: background 0.3s ease;
+        align-self: flex-start;
+      }
+
+      /* 콜스택과 로그를 가로 배치 */
+      #mainContainer {
+        display: flex;
+        gap: 30px;
+        width: 100%;
+        max-width: 720px;
+        justify-content: center;
+      }
+
+      /* 콜스택 영역 */
+      #stackContainer {
+        width: 280px;
+        min-height: 320px;
+        border: 2px solid #f1c40f;
+        background: #fff;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column-reverse; /* 아래부터 위로 쌓임 */
+        padding: 16px;
+        position: relative;
+      }
+      #stackTitle {
+        position: absolute;
+        top: -36px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #f1c40f;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        user-select: none;
+        letter-spacing: 0.8px;
+        color: #5f542f;
+      }
+
+      .stackBox {
+        border: 2px solid #f1c40f;
+        border-radius: 6px;
+        padding: 18px 0;
+        margin-top: 12px;
+        text-align: center;
+        font-weight: 600;
+        color: #5f542f;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        opacity: 0;
+        transform: translateY(20px);
+        font-size: 1rem;
+      }
+      .stackBox.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* 로그 영역 */
+      #logArea {
+        flex-grow: 1;
+        max-width: 400px;
+        background: #fff;
+        border: 2px solid #f1c40f;
+        border-radius: 8px;
+        padding: 14px 16px;
+        font-size: 0.95rem;
+        min-height: 320px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        color: #5f542f;
+      }
+      #logArea b {
+        color: #5f542f;
+
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="btnRun">실행 시작</button>
+
+    <div id="mainContainer">
+      <div id="stackContainer" aria-label="콜스택">
+        <div id="stackTitle">Call Stack</div>
+        <!-- 함수 호출 박스들 -->
+      </div>
+
+      <div id="logArea"><b>실행 로그</b></div>
+    </div>
+
+    <script>
+      const stackContainer = document.getElementById('stackContainer')
+      const btnRun = document.getElementById('btnRun')
+      const logArea = document.getElementById('logArea')
+
+      const steps = [
+        { action: 'push', fn: 'first' },
+        { action: 'push', fn: 'second' },
+        { action: 'push', fn: 'third' },
+        { action: 'pop', fn: 'third' },
+        { action: 'pop', fn: 'second' },
+        { action: 'pop', fn: 'first' },
+      ]
+
+      let currentStack = []
+
+      function log(text) {
+        const p = document.createElement('div')
+        p.textContent = text
+        logArea.appendChild(p)
+        logArea.scrollTop = logArea.scrollHeight
+      }
+
+      function pushStack(fnName) {
+        currentStack.push(fnName)
+        const box = document.createElement('div')
+        box.className = 'stackBox'
+        box.textContent = fnName + '()'
+        stackContainer.appendChild(box)
+        setTimeout(() => box.classList.add('show'), 20)
+        log(`→ ${fnName} 함수 호출`)
+      }
+
+      function popStack(fnName) {
+        const boxes = stackContainer.querySelectorAll('.stackBox')
+        for (let i = boxes.length - 1; i >= 0; i--) {
+          if (boxes[i].textContent.startsWith(fnName)) {
+            boxes[i].classList.remove('show')
+            setTimeout(() => {
+              boxes[i].remove()
+              log(`← ${fnName} 함수 종료`)
+            }, 350)
+            break
+          }
+        }
+        currentStack.pop()
+      }
+
+      async function runSimulation() {
+        btnRun.disabled = true
+        currentStack = []
+        stackContainer
+          .querySelectorAll('.stackBox')
+          .forEach((box) => box.remove())
+        logArea.innerHTML = '<b>실행 로그</b>'
+
+        for (let i = 0; i < steps.length; i++) {
+          const step = steps[i]
+          if (step.action === 'push') pushStack(step.fn)
+          else if (step.action === 'pop') popStack(step.fn)
+          await delay(1100)
+        }
+        btnRun.disabled = false
+      }
+
+      function delay(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms))
+      }
+
+      btnRun.addEventListener('click', runSimulation)
+    </script>
+  </body>
+</html>
