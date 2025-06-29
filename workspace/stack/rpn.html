@@ -2,104 +2,154 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <title>후위표기법 스택 시각화</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>후위 표기법 계산 과정 시각화 (설명 박스 위, 간격 넓게)</title>
     <style>
       body {
-        font-family: 'Noto Sans KR', sans-serif;
-        background: #f7f7f7;
+        font-family: 'Arial', sans-serif;
         padding: 20px;
       }
       h1 {
         text-align: center;
-        color: #333;
+        margin-bottom: 16px;
+      }
+      #expression {
+        font-size: 1.3rem;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      #steps {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 10px;
       }
       .step {
-        background: #ffffff;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 16px;
-        margin: 20px auto;
-        max-width: 500px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-      }
-      .step-title {
-        font-weight: bold;
-        margin-bottom: 12px;
-        color: #444;
-      }
-      .stack-box {
+        padding: 12px 15px;
+        border-radius: 6px;
+        min-width: 140px;
         display: flex;
-        flex-direction: column-reverse; /* 아래에서 위로 쌓이게 */
-        gap: 8px;
-        background: #eef7ff;
-        border: 2px solid #3399cc;
-        padding: 10px;
-        border-radius: 8px;
-        width: 120px;
-        margin: 0 auto;
+        flex-direction: column;
+        align-items: center;
+      }
+      .step strong {
+        font-size: 0.95rem;
+        margin-bottom: 20px; /* 설명 텍스트와 스택 사이 간격 넓게 */
+        text-align: center;
+        user-select: none;
+      }
+      .stack-container {
+        display: flex;
+        flex-direction: column-reverse; /* 아래에서 위로 쌓이는 효과 */
+        align-items: center;
+        min-height: 120px;
+        gap: 6px;
+        border: 1px solid #ddd;
+        padding: 8px;
+        width: 60px;
+        border-radius: 6px;
+        border: 2px solid #f1c40f;
       }
       .stack-item {
-        background: #3399cc;
+        background: #f1c40f;
         color: white;
-        text-align: center;
-        padding: 8px;
-        border-radius: 6px;
+        padding: 8px 12px;
+        border-radius: 4px;
         font-weight: bold;
+        min-width: 40px;
+        text-align: center;
+        user-select: none;
+      }
+      code {
+        background: #f1c40f;
+        padding: 2px 5px;
+        border-radius: 3px;
       }
     </style>
   </head>
   <body>
-    <h1>후위표기법 계산 과정</h1>
-    <div id="container"></div>
+    <h1>후위 표기법 계산 과정 시각화</h1>
+    <div id="expression">
+      후위식: <code>3 4 + 2 *</code> (중위식: ((3 + 4) * 2))
+    </div>
+
+    <div id="steps"></div>
 
     <script>
-      const tokens = ['3', '4', '+', '2', '*']
-      const steps = []
+      const expression = ['3', '4', '+', '2', '*']
+      const stepsContainer = document.getElementById('steps')
       let stack = []
 
-      tokens.forEach((token, idx) => {
-        if (!isNaN(token)) {
-          stack.push(token)
-          steps.push({
-            step: idx + 1,
-            action: `피연산자 ${token} push`,
-            stack: [...stack],
-          })
-        } else {
-          const b = stack.pop()
-          const a = stack.pop()
-          const result = `(${a} ${token} ${b})`
-          stack.push(result)
-          steps.push({
-            step: idx + 1,
-            action: `연산자 ${token}: ${a} ${token} ${b} 연산 → 결과 push`,
-            stack: [...stack],
-          })
-        }
-      })
+      function renderStack() {
+        if (stack.length === 0) return '<i>스택 비어있음</i>'
+        return `<div class="stack-container">${stack
+          .map((v) => `<div class="stack-item">${v}</div>`)
+          .join('')}</div>`
+      }
 
-      const container = document.getElementById('container')
-      steps.forEach(({ step, action, stack }) => {
-        const div = document.createElement('div')
-        div.className = 'step'
+      // 1단계: 숫자 3 push
+      let stepNum = 1
+      stack.push('3')
+      stepsContainer.innerHTML += `
+    <div class="step">
+      <strong>${stepNum}. 숫자 3 push</strong>
+      ${renderStack()}
+    </div>
+  `
 
-        const title = document.createElement('div')
-        title.className = 'step-title'
-        title.textContent = `단계 ${step}: ${action}`
-        div.appendChild(title)
+      // 2단계: 숫자 4 push
+      stepNum++
+      stack.push('4')
+      stepsContainer.innerHTML += `
+    <div class="step">
+      <strong>${stepNum}. 숫자 4 push</strong>
+      ${renderStack()}
+    </div>
+  `
 
-        const stackDiv = document.createElement('div')
-        stackDiv.className = 'stack-box'
-        stack.forEach((item) => {
-          const itemDiv = document.createElement('div')
-          itemDiv.className = 'stack-item'
-          itemDiv.textContent = item
-          stackDiv.appendChild(itemDiv)
-        })
+      // 3단계: '+' 연산자, 두 개 pop 후 계산, 결과 push
+      stepNum++
+      let b = Number(stack.pop())
+      let a = Number(stack.pop())
+      let result = a + b
+      stack.push(result.toString())
+      stepsContainer.innerHTML += `
+    <div class="step">
+      <strong>${stepNum}. '+' 연산자: pop ${b}, ${a}, 계산 → ${result} push</strong>
+      ${renderStack()}
+    </div>
+  `
 
-        div.appendChild(stackDiv)
-        container.appendChild(div)
-      })
+      // 4단계: 숫자 2 push
+      stepNum++
+      stack.push('2')
+      stepsContainer.innerHTML += `
+    <div class="step">
+      <strong>${stepNum}. 숫자 2 push</strong>
+      ${renderStack()}
+    </div>
+  `
+
+      // 5단계: '*' 연산자, 두 개 pop 후 계산, 결과 push
+      stepNum++
+      b = Number(stack.pop())
+      a = Number(stack.pop())
+      result = a * b
+      stack.push(result.toString())
+      stepsContainer.innerHTML += `
+    <div class="step">
+      <strong>${stepNum}. '*' 연산자: pop ${b}, ${a}, 계산 → ${result} push</strong>
+      ${renderStack()}
+    </div>
+  `
+
+      // 6단계: 최종 결과 출력
+      stepNum++
+      stepsContainer.innerHTML += `
+    <div class="step">
+      <strong>${stepNum}. 계산 완료 → 최종 결과: ${stack[0]}</strong>
+      ${renderStack()}
+    </div>
+  `
     </script>
   </body>
 </html>
